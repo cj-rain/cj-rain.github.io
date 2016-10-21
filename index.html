@@ -61,6 +61,115 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-New Document1" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/10/21/New Document1/" class="article-date">
+  <time datetime="2016-10-21T15:06:21.160Z" itemprop="datePublished">2016-10-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Python爬取教务系统成绩"><a href="#Python爬取教务系统成绩" class="headerlink" title="Python爬取教务系统成绩"></a>Python爬取教务系统成绩</h1><h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>抓包工具</p>
+<p>谷歌浏览器chrome自带的http抓包工具界面简洁大方，功能也很强大，唯一的不足就是界面是英文的。打开方式：点击右上角的菜单–&gt;工具–&gt;开发者工具。<br>我们常用的360浏览器也内置了http抓包工具，打开方式：工具–&gt;开发人员工具，与谷歌类似。</p>
+<p> pycharm</p>
+<p>pycharm是推荐大家使用的python的IDE，安装即可</p>
+<p>anconda2</p>
+<p>anconda2是 Python 科学技术包的合集，有自己的包管理工具 conda，同时支持pip工具，自带了很多常用的python的库，特别是一些很难安装的库。安装过程中，添加python到环境变量中去。<br>python2.7 是官方下载的python安装包，如果不想使用anaconda2，就安装这个，但装完之后，需要用pip去安装python库。添加python到环境变量中去。注意，如果安装了anaconda2就不用装这个，二选一。</p>
+<p>phantomJS</p>
+<p>phantomJS 是一个无界面浏览器，作为爬虫的工具使用。无需安装，解压即可。<br>ps:windows 下要将phantomjs.exe所在路径加入到环境变量的path中</p>
+<p>pyExcelerator</p>
+<p>初始pyExcelerator<br>将pyExcelerator产品包（pyexcelerator-0.6.3a.tgz）上传到服务器上之后解压缩，然后在产品目录下键入如 下命令：</p>
+<pre><code># python setup.py install
+</code></pre><p>在命令行中，你将看到一连串的running，creating，copying，byte—compiling<br>最后一行出现<br>Writing C:/Python26/Lib/site-packages/pyExcelerator-0.6.4.1-py2.6.egg-info<br>说明已经将插件安装到你的python环境中了，至此安装完成。</p>
+<h3 id="代码编写"><a href="#代码编写" class="headerlink" title="代码编写"></a>代码编写</h3><p>　　<br>导入模块</p>
+<p>首先，把需要的库导入<br>比如：import os</p>
+<p>模拟登陆</p>
+<p>网站地址</p>
+<pre><code>URL = &apos;http://sso.jwc.whut.edu.cn/Certification//toIndex.do&apos;
+</code></pre><p>浏览器路径</p>
+<pre><code>phantomjs_path=&apos;E:/phantomjs-2.1.1-windows/bin/phantomjs.exe&apos;
+driver = webdriver.PhantomJS(phantomjs_path)
+</code></pre><p>使用webdriver打开网页</p>
+<pre><code>driver.get(URL)
+</code></pre><p>可通过以下方法定位元素（在网页源代码中）</p>
+<pre><code>find_element_by_id                 一个
+find_elements_by_name                        多个
+</code></pre><p>通过 id 找到用户名和密码,比如：</p>
+<pre><code>userName_tag = driver.find_element_by_name(&apos;userName&apos;)
+</code></pre><p>模拟登陆，输入学号和密码，使用send_keys</p>
+<pre><code>userName_tag.send_keys(&apos;0121510880318&apos;)
+</code></pre><p>因为登陆按钮的类型为submit，所以使用submit</p>
+<pre><code>driver.find_element_by_id(&apos;imageField&apos;).submit()
+</code></pre><p>而对于成绩查询，因为class=selected，所以使用click：</p>
+<pre><code>driver.find_element_by_link_text(&apos;成绩查询&apos;).click()
+select_tag = driver.find_element_by_id(&apos;lscj_xnxq&apos;)
+xnxq_list = [&apos;2015-2016-1&apos;,&apos;2015-2016-2&apos;]
+</code></pre><p>进入”历史成绩查询界面”<br>点击学年学期</p>
+<pre><code>select_tag.find_element_by_xpath(&quot;//option[@value=&apos;{0}&apos;]&quot;.format(xnxq)).click()
+</code></pre><p>xpath用法可参考这个网址：</p>
+<pre><code>http://www.wtoutiao.com/p/2bfcDmK.html
+</code></pre><p>获取网页中文本： </p>
+<pre><code>body_str=driver.find_element_by_tag_name(&apos;body&apos;).get_attribute(&apos;innerHTML&apos;)
+</code></pre><p>写入一个文件：</p>
+<pre><code>soup=BeautifulSoup(body_str, &apos;lxml&apos;)
+with open(os.path.join(direction,  xnxq+&apos;.txt&apos;),&apos;w&apos;) as f0:
+f_r.write(str(soup))
+body_str=driver.find_element_by_tag_name(&apos;body&apos;).get_attribute(&apos;innerHTML&apos;)
+soup=BeautifulSoup(body_str, &apos;lxml&apos;)
+</code></pre><p>打印并退出</p>
+<pre><code>print soup
+driver.quit()
+</code></pre><p>提取所需元素</p>
+<p>打开之前的TXT文档，通过标签查找元素，因为找到要提取的内容在td标签下，所以逐层查找</p>
+<pre><code>thead=soup.find(&apos;thead&apos;)
+th_list=[th.get_text() for th in thead.find_all(&apos;th&apos;)]
+table=soup.find(&apos;table&apos;,id=&quot;undefined&quot;)
+tr_tag_l1 = [td.get_text() for td in table.find_all(&apos;td&apos;)]
+</code></pre><p>写入excel表并计算GPA</p>
+<p>使用pyExcelerator来读写 Excel文件，PyExcelerator是一个第三方库，用来处理Excel文件。</p>
+<p>它的优点是：</p>
+<ul>
+<li><p>简单易用，上手快。</p>
+</li>
+<li><p>写操作很方便，适合用来生成Excel文件记录数据。</p>
+</li>
+<li><p>不需要WinCOM支持，没装Office也 可以生成Excel表格</p>
+</li>
+</ul>
+<p>当然，PyExcelerator也是有缺点的，它所提供的读写操作方式相对简单，要对已有的Excel文件进行修改，就显得比较麻烦了。而这里没有对文件的更改，所以这个是很好的选择。<br>如果要对已有的Excel表格进行较复杂的修改操作，选择PyExcelerator就不太合适了，这时候可以试试另外的方法。比如使用 pywin32通过WinCOM来操作Excel表格，或者使用xlrd。</p>
+<p>这里提一个小例子：</p>
+<pre><code>from pyExcelerator import *
+w = Workbook() #创建一个工作簿
+ws = w.add_sheet(&apos;Hey, Hades&apos;) #创建一个工作表
+ws.write(0,0,&apos;bit&apos;) #在1行1列写入bit
+ws.write(0,1,&apos;huang&apos;) #在1行2列写入huang
+ws.write(1,0,&apos;xuan&apos;) #在2行1列写入xuan
+w.save(&apos;mini.xls&apos;) #保存
+</code></pre><h2 id="遇到的问题及解决方案"><a href="#遇到的问题及解决方案" class="headerlink" title="遇到的问题及解决方案"></a>遇到的问题及解决方案</h2><h3 id="plantomjs的安装"><a href="#plantomjs的安装" class="headerlink" title="plantomjs的安装"></a>plantomjs的安装</h3><p>必须添加到PATH路径,否则会报错。</p>
+<h3 id="提取td标签中的内容"><a href="#提取td标签中的内容" class="headerlink" title="提取td标签中的内容"></a>提取td标签中的内容</h3><p>光找到td是不行的，必须将其中的内容提取出来，利用.get_text()函数</p>
+<h3 id="多个内容的选择"><a href="#多个内容的选择" class="headerlink" title="多个内容的选择"></a>多个内容的选择</h3><pre><code>select_tag = driver.find_element_by_id(&apos;lscj_xnxq&apos;)
+xnxq_list = [&apos;2015-2016-1&apos;,&apos;2015-2016-2&apos;]
+For xnxp in xnxp_list:
+select_tag.find_element_by_xpath(&quot;//option[@value=&apos;{0}&apos;]&quot;.format(xnxq)).click()
+</code></pre><h3 id="Beautiful-soup的使用"><a href="#Beautiful-soup的使用" class="headerlink" title="Beautiful soup的使用"></a>Beautiful soup的使用</h3><p>keyword 参数<br>注意：如果一个指定名字的参数不是搜索内置的参数名,搜索时会把该参数当作指定名字tag的属性来搜索,如果包含一个名字为 id 的参数,Beautiful Soup会搜索每个tag的”id”属性</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/10/21/New Document1/" data-id="ciujywoj600004w6r54qnpwjh" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-New Document" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/10/03/New Document/" class="article-date">
@@ -220,7 +329,7 @@ at generateError (D:\hexo\node_modules\hexo\node_modules\js-yaml\lib\js-yaml
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/10/03/New Document/" data-id="citvkknl80000ek6rvtakwjm6" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/10/03/New Document/" data-id="ciujx918y0003rc6r6cs3i4nj" class="article-share-link">Share</a>
       
       
     </footer>
@@ -265,7 +374,7 @@ at generateError (D:\hexo\node_modules\hexo\node_modules\js-yaml\lib\js-yaml
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2016/09/25/hello-world/" data-id="citvkknl80002ek6rn3miza16" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2016/09/25/hello-world/" data-id="ciujx917q0000rc6rqv79nj3x" class="article-share-link">Share</a>
       
       
     </footer>
@@ -303,6 +412,10 @@ at generateError (D:\hexo\node_modules\hexo\node_modules\js-yaml\lib\js-yaml
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2016/10/21/New Document1/">(no title)</a>
+          </li>
         
           <li>
             <a href="/2016/10/03/New Document/">(no title)</a>
